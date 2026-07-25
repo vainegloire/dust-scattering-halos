@@ -1,0 +1,42 @@
+cff-version: 1.2.0
+message: "If you use this code or refer to this work, please cite it as below."
+title: "Dust-Scattering Halos and Gravitational-Wave Counterpart Localization"
+abstract: >-
+  Monte-Carlo forward model and maximum-likelihood localization for Galactic
+  dust-scattering halos produced by X-ray flashes from gravitational-wave
+  sources. Implements an explicit localization algorithm saturating the
+  Cramer-Rao bound, a self-calibrating estimator requiring no prior dust
+  model, halo tomography of the intervening dust, and a matched-filter
+  detection analysis. Extends Nederlander & Paerels (2020).
+type: software
+authors:
+  - given-names: "Luiz Henrique"
+    family-names: "Gabiatti Backes"
+    email: luizhgabiatti@proton.me
+    affiliation: "Columbia University, New York, NY, USA"
+version: "1.0.0"
+date-released: "2026-07-24"
+license: MIT
+keywords:
+  - gravitational waves
+  - X-ray astronomy
+  - interstellar dust
+  - scattering halos
+  - source localization
+  - maximum likelihood
+  - inverse problems
+references:
+  - type: article
+    title: >-
+      Detecting and Locating Electromagnetic Counterparts to Gravitational
+      Wave Sources Using Galactic Dust Scattering Halos
+    authors:
+      - given-names: "Richard"
+        family-names: "Nederlander"
+      - given-names: "Frits"
+        family-names: "Paerels"
+    journal: "The Astrophysical Journal"
+    volume: 890
+    start: 135
+    year: 2020
+    doi: "10.3847/1538-4357/ab6dc5"

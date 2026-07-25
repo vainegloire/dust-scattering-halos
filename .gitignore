@@ -1,0 +1,20 @@
+# LaTeX build intermediates (paper.tex and paper.pdf are tracked deliberately)
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# OS / editor
+.DS_Store
+.Rhistory
+*.swp
+
+# Generated from paper.md by build_latex.sh / pandoc — rebuild rather than track
+paper.tex
+*.docx
