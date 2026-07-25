@@ -97,7 +97,7 @@ exists in `../results/`; run the corresponding data script first.
 
 ```sh
 bash build_latex.sh                                   # -> paper.tex, paper.pdf
-pandoc paper.md -o Gabiatti_scattering_halos_draft.docx
+pandoc paper.md -o paper.docx
 ```
 
 The build script runs pandoc, strips the manual figure/table labels so LaTeX
