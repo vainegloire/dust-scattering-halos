@@ -78,6 +78,18 @@ class Cloud:
         self.a_um = float(a_um)
 
 
+# The fiducial multi-screen sightline used throughout the paper (Sections 3.2,
+# 3.3, 3.5, 3.6, 3.8).  Defined once, here, because several scripts had
+# drifted to slightly different optical depths, which made Figure 5 compare
+# two subtly different halos.  Table 1 was produced with these values.
+FIDUCIAL_SCREENS = ((60.0, 1.0), (150.0, 1.3), (400.0, 1.6))    # (d_pc, tau)
+
+
+def fiducial_clouds(a_um=0.1):
+    """The paper's three-screen sightline as a list of Cloud objects."""
+    return [Cloud(d, tau, a_um) for d, tau in FIDUCIAL_SCREENS]
+
+
 # ---------------------------------------------------------------------------
 # Forward model: simulate a detected photon list
 # ---------------------------------------------------------------------------

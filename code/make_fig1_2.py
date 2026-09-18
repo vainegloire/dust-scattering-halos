@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from halo import Cloud, simulate_halo, localize, theta_ring_arcmin
+from halo import fiducial_clouds, Cloud, simulate_halo, localize, theta_ring_arcmin
 
 plt.rcParams.update({"font.size": 11, "figure.dpi": 130})
 rng = np.random.default_rng(42)
@@ -32,7 +32,7 @@ fig.colorbar(im, ax=ax[1], fraction=0.046, pad=0.04, label='log L')
 fig.tight_layout(); fig.savefig("../figures/fig1_single_cloud.png"); plt.close(fig)
 
 # ---- Figure 2: three screens -----------------------------------------
-clm = [Cloud(60, 1.0, 0.1), Cloud(150, 1.3, 0.1), Cloud(400, 1.6, 0.1)]
+clm = fiducial_clouds()
 d2 = simulate_halo(clm, 6*3600, 1300, 1.0, n_signal=600, bkg_per_arcmin2=0.07,
                    fov_arcmin=20.0, source_xy=(0.0, 0.0), rng=rng)
 xc2, yc2, L2, ext2 = localize(d2, half_width=6, n_grid=61)

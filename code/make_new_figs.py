@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from halo import (Cloud, simulate_halo, localize_selfcal,
+from halo import (fiducial_clouds, Cloud, simulate_halo, localize_selfcal,
                   recover_ring_radii, theta_ring_arcmin)
 
 plt.rcParams.update({"font.size": 11, "figure.dpi": 130})
@@ -34,7 +34,7 @@ fig.tight_layout(); fig.savefig("../figures/fig5_selfcal_vs_template.png"); plt.
 
 # ---- Figure 6: halo tomography ---------------------------------------
 rng = np.random.default_rng(7)
-clm = [Cloud(60, 1.2, 0.1), Cloud(150, 1.3, 0.1), Cloud(400, 1.5, 0.1)]
+clm = fiducial_clouds()
 t_obs = 6*3600 + 650
 d = simulate_halo(clm, 6*3600, 1300, 1.0, n_signal=800,
                   bkg_per_arcmin2=0.07, fov_arcmin=20.0,
@@ -72,23 +72,18 @@ ax[1].set_xlim(0, 450); ax[1].set_ylim(0, 450)
 ax[1].grid(True, alpha=0.3)
 fig.tight_layout(); fig.savefig("../figures/fig6_tomography.png"); plt.close(fig)
 
-# ---- catastrophic-failure fraction at low N (single & multi) ---------
-def failure_fraction(clouds, n, thresh=20.0, K=60, seed=99):
-    r = np.random.default_rng(seed)
-    fails = 0
-    for _ in range(K):
-        dd = simulate_halo(clouds, 6*3600, 1300, 1.0, n_signal=n,
-                           bkg_per_arcmin2=0.07, fov_arcmin=20.0,
-                           source_xy=(0.0, 0.0), rng=r)
-        xx, yy, _, _ = localize_selfcal(dd, half_width=5, n_grid=41)
-        if np.hypot(xx, yy) * 60.0 > thresh:
-            fails += 1
-    return fails / K
-
-
-f30 = failure_fraction(clm, 30)
-f60 = failure_fraction(clm, 60)
+# ---- catastrophic-failure fraction at low N -------------------------
+# Read from the accumulated self-calibration trials rather than recomputed
+# here: selfcal_mc.py runs K = 120 per photon count with a single threshold
+# (30 arcsec), and its raw per-trial errors are kept in results/ so that this
+# number is auditable the same way Table 1 is.  (An earlier version of this
+# script recomputed the fraction inline with K = 60 and a 20 arcsec
+# threshold, which quietly disagreed with the figure quoted in the text.)
+f30 = self_["multi"]["30"]["fail_frac"]
+f60 = self_["multi"]["60"]["fail_frac"]
+K30 = self_["multi"]["30"]["K"]
 print("tomography detected peaks (theta_arcmin, d_pc):", [(round(t,2), round(dd)) for t,dd in peaks])
 print("true (theta, d):", [(round(tt,2), dd) for tt, dd in zip(true_theta, true_d)])
-print(f"self-cal catastrophic-failure fraction (>20 arcsec): N=30 -> {f30:.2f}, N=60 -> {f60:.2f}")
+print(f"self-cal catastrophic-failure fraction (>30 arcsec, K={K30}): "
+      f"N=30 -> {f30:.3f}, N=60 -> {f60:.3f}")
 print("Saved fig5, fig6.")

@@ -7,10 +7,10 @@ Usage:
 """
 import sys, json, os
 import numpy as np
-from halo import Cloud, simulate_halo, localize
+from halo import fiducial_clouds, Cloud, simulate_halo, localize
 
 cl1 = [Cloud(100.0, 1.0, 0.1)]
-clm = [Cloud(60, 1.0, 0.1), Cloud(150, 1.3, 0.1), Cloud(400, 1.6, 0.1)]
+clm = fiducial_clouds()
 n_list = [30, 60, 120, 250, 500, 1000]
 BKG = {"ideal": 0.0, "bkg": 0.07, "multi": 0.07}
 CLOUDS = {"ideal": cl1, "bkg": cl1, "multi": clm}

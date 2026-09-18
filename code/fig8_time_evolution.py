@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from halo import (Cloud, simulate_halo, localize_selfcal, recover_ring_radii,
+from halo import (fiducial_clouds, Cloud, simulate_halo, localize_selfcal, recover_ring_radii,
                   theta_ring_arcmin)
 
 plt.rcParams.update({"font.size": 11, "figure.dpi": 130})
@@ -30,7 +30,7 @@ ax[0].set_title('Single screen (100 pc) at two epochs:\nthe ring expands as $\\s
 ax[0].legend(loc='upper right', fontsize=8)
 
 # --- Panel B: ring radius vs time for three screens -------------------
-clm = [Cloud(60, 1.4, 0.1), Cloud(150, 1.3, 0.1), Cloud(400, 1.5, 0.1)]
+clm = fiducial_clouds()
 epochs_hr = [2, 3, 4, 6, 9, 12]
 meas = {c.d_pc: [] for c in clm}
 meas_t = {c.d_pc: [] for c in clm}
