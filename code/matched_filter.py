@@ -31,17 +31,23 @@ Tr = s - mean_s
 Tr = Tr / np.abs(Tr).max()
 
 
-def mf_max(data, half_width=6.0, n_grid=25):
+# Trial centres cover the part of the field in which the 7' ring (plus its
+# PSF-smeared width) lies entirely inside the 40' x 40' field, |c| <= 12',
+# on a 0.2' grid -- finer than the ring width (sigma_r ~ 0.16'), so the
+# maximum of D is not under-sampled.  (An earlier version used a 0.5' grid
+# over +/-6', which under-estimated the null maximum by ~0.6 and the
+# required photon count by ~2-4; see audit of 2026-09-16.)
+HALF_WIDTH, GRID_STEP = 12.0, 0.2
+
+
+def mf_max(data, half_width=HALF_WIDTH, step=GRID_STEP):
     x, y = data['x'], data['y']
-    gx = np.linspace(-half_width, half_width, n_grid)
+    g = np.arange(-half_width, half_width + 0.5*step, step)
     best = -np.inf
-    for yc in gx:
-        yy = (y - yc)**2
-        for xc in gx:
-            r = np.sqrt((x - xc)**2 + yy)
-            v = np.interp(r, rg, Tr).sum()
-            if v > best:
-                best = v
+    for yc in g:                                   # vectorised over xc
+        r = np.sqrt((x[None, :] - g[:, None])**2 + (y[None, :] - yc)**2)
+        v = np.interp(r, rg, Tr).sum(axis=1)
+        best = max(best, v.max())
     return best
 
 
@@ -53,8 +59,21 @@ def make(n_signal, seed):
 
 
 # --- null distribution (background only) ------------------------------
+# The fine-grid search is slow (~0.1-0.3 s per field), so the per-field
+# statistics are cached in ../results/matched_filter_cache.npz and the
+# script can be re-run to resume (delete the cache to recompute from scratch).
+import os
+CACHE = "../results/matched_filter_cache.npz"
+_c = dict(np.load(CACHE)) if os.path.exists(CACHE) else {}
+
+def _cached(key, fn):
+    if key not in _c:
+        _c[key] = np.asarray(fn())
+        np.savez(CACHE, **_c)
+    return _c[key]
+
 Knull = 400
-Dnull = np.array([mf_max(make(0, 5000+i)) for i in range(Knull)])
+Dnull = _cached("Dnull", lambda: [mf_max(make(0, 5000+i)) for i in range(Knull)])
 mu0, sd0 = Dnull.mean(), Dnull.std()
 # Gumbel fit (method of moments) to the max statistic
 beta = sd0*np.sqrt(6)/np.pi
@@ -66,7 +85,7 @@ Ksig = 40
 Dsig_mean = []
 Dsig_all = {}
 for N in Nsig:
-    vals = np.array([mf_max(make(N, 9000+N*10+i)) for i in range(Ksig)])
+    vals = _cached(f"Dsig_{N}", lambda: [mf_max(make(N, 9000+N*10+i)) for i in range(Ksig)])
     Dsig_mean.append(vals.mean())
     Dsig_all[N] = vals
 Dsig_mean = np.array(Dsig_mean)
@@ -82,7 +101,7 @@ Nreq = np.clip((Tthr - c0)/a, 0, None)
 
 # single-field 5 sigma threshold and the significance of a faint halo
 Tthr_1 = mu_g + beta*np.log(1.0/alpha_global)
-sig45 = (np.mean([mf_max(make(45, 20000+i)) for i in range(30)]) - mu0)/sd0
+sig45 = (np.mean(_cached("D45", lambda: [mf_max(make(45, 20000+i)) for i in range(30)])) - mu0)/sd0
 
 # ---------------- figure ----------------------------------------------
 fig, ax = plt.subplots(1, 2, figsize=(11, 4.6))

@@ -36,17 +36,26 @@ ax.set_title(f'Localization: simulation vs analytic bound\n($\\sigma_r$ = {sigma
 ax.grid(True, which='both', alpha=0.3); ax.legend(fontsize=8.5)
 fig.tight_layout(); fig.savefig("../figures/fig3_localization_scaling.png"); plt.close(fig)
 
-# --- Fig 10: localization vs X-ray efficiency for a fiducial event ----
+# --- Fig 11: localization vs X-ray efficiency for a fiducial event ----
 # NP20 fiducial: source at 400 Mpc, 100 pc dust path, 100 cm^2 effective
-# area -> N ~ 4500 * eps_-5 halo photons over the halo lifetime (eps_-5 = eps/1e-5).
-N_of_eps = lambda e5: 4500.0 * e5
+# area -> 4500 * eps_-5 scattered photons in TOTAL (eps_-5 = eps/1e-5).  Only
+# the fraction arriving within a day-long campaign is usable: with the
+# Gaussian cross section the fraction scattered inside angle theta is
+# 1 - exp(-theta^2 / 2 theta0^2), evaluated at the ring radius reached at
+# t = 24 hr (NP20 quote t_1/2 ~ 18 hr for half the light).
+from halo import theta_ring_arcmin, theta0_arcmin
+N_TOTAL = 4500.0
+T_DAY = 24 * 3600.0
+F_DAY = 1.0 - np.exp(-theta_ring_arcmin(T_DAY, 100.0)**2 / (2 * theta0_arcmin()**2))
+N_DAY = N_TOTAL * F_DAY                 # photons collectable within 24 hr
+N_of_eps = lambda e5: N_DAY * e5
 eps5 = np.logspace(-2, 1, 100)
 err = 2*sigma_r_as/np.sqrt(N_of_eps(eps5))
 
 fig, ax = plt.subplots(figsize=(7.0, 5.1))
-ax.plot(eps5, err, 'C3-', lw=2, label=r'$2\sigma_r/\sqrt{N},\ N=4500\,\epsilon_{-5}$')
+ax.plot(eps5, err, 'C3-', lw=2, label=r'$2\sigma_r/\sqrt{N},\ N=%d\,\epsilon_{-5}$ (24 hr)' % round(N_DAY))
 # validation: MC points mapped to their equivalent efficiency
-mc_eps = np.array(n_list)/4500.0
+mc_eps = np.array(n_list)/N_DAY
 ax.plot(mc_eps, rms("ideal"), 'ko', ms=6, label='simulation')
 ax.axhline(35, color='0.5', ls=':', lw=1.2)
 ax.text(1.1e-2, 38, 'host-galaxy separation ($\\sim$35$^{\\prime\\prime}$)', fontsize=8.5, color='0.4')
@@ -56,12 +65,13 @@ ax.set_xscale('log'); ax.set_yscale('log')
 ax.set_xlabel(r'X-ray efficiency  $\epsilon_{-5} = \epsilon/10^{-5}$')
 ax.set_ylabel('localization error (arcsec, RMS)')
 ax.set_title('Expected localization for a fiducial event\n(400 Mpc, 100 pc dust, 100 cm$^2$ effective area)')
-secax = ax.secondary_xaxis('top', functions=(N_of_eps, lambda N: N/4500.0))
+secax = ax.secondary_xaxis('top', functions=(N_of_eps, lambda N: N/N_DAY))
 secax.set_xlabel('detected halo photons  $N$')
 ax.grid(True, which='both', alpha=0.3); ax.legend(fontsize=9, loc='lower left')
 fig.tight_layout(); fig.savefig("../figures/fig11_feasibility.png"); plt.close(fig)
 
 print(f"measured sigma_r = {sigma_r:.4f} arcmin = {sigma_r_as:.2f} arcsec")
+print(f"fraction of scattered photons arriving within 24 hr: {F_DAY:.3f}  -> N_day = {N_DAY:.0f} eps_-5")
 print("N   MC_ideal(\")   CRB(\")")
 for n in n_list:
     print(f"{n:5d}  {mc['ideal'][str(n)]['rms']:8.2f}   {2*sigma_r_as/np.sqrt(n):6.2f}")
