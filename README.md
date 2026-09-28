@@ -7,18 +7,20 @@ sources. Independent undergraduate research extending Nederlander & Paerels
 
 **Status: working draft, circulated for discussion. Not submitted.**
 
-**Known issue (September 2026).** In the simulations with several dust
-screens, each screen contributes photons in proportion to its optical depth
-alone. The physical rate at a given epoch carries an extra factor 1/d, because
-a screen at distance d spreads its photons over delays proportional to d. Near
-screens are therefore under-weighted: in the fiducial 60/150/400 pc sightline,
-the 60 pc screen by a factor 400/60 ≈ 6.7 relative to the 400 pc screen. Single-screen results are
-unaffected. Every result that uses more than one screen is being regenerated:
-the three-screen column of Table 1, Figures 2, 5–7 and 8 (right), and the
-multi-screen results of Sections 3.2 and 3.5–3.8, including the tomography
-and the 50-sightline ensemble. A preliminary re-run with corrected yields
-changes most localization errors by less than about 20%; the tomography has
-not yet been re-checked.
+**Correction (28 September 2026).** Earlier versions drew photons from each
+dust screen in proportion to its optical depth alone. The physical rate at a
+given epoch carries an extra factor 1/d, because a screen at distance d
+spreads its photons over delays proportional to d, so near screens were
+under-weighted (the 60 pc screen of the fiducial sightline by a factor
+400/60 ≈ 6.7 relative to the 400 pc screen). The simulator and the likelihood
+template are fixed, `code/test_yields.py` checks them, and every result that
+uses more than one screen has been regenerated (Table 1's three-screen
+column, Figures 2, 5–8, Sections 3.2 and 3.5–3.8). Single-screen results were
+unaffected. The conclusions stand: the multi-screen localization numbers
+moved within Monte Carlo noise, the tomography is unchanged, and the
+realistic sightline of Figure 7 now recovers its nearby clouds, which the old
+weighting had suppressed. Seeds for the regenerated runs: 2809 (Table 1),
+2810 (self-calibration), 2811 (ensemble).
 
 ## Summary
 
@@ -37,8 +39,8 @@ quantifies the achievable precision for realistic, clumpy sightlines:
 - **Halo tomography.** The same rings measure the distances to the
   intervening dust screens (60/150/400 pc recovered as 60/151/403 pc).
 - **Robustness.** Results survive a realistic eight-cloud sightline (median
-  1.3″ over a 50-sightline ensemble), soft X-ray background, and the loss of
-  all dust prior information.
+  1.25″ over a 50-sightline ensemble), soft X-ray background, and the loss
+  of all dust prior information.
 - **Detection.** A matched-filter analysis shows the ring is a >5σ feature
   for a few tens of photons, with only a logarithmic trials penalty across a
   tiled all-sky search.
@@ -102,6 +104,8 @@ read/write JSON in `../results/`, and write figures to `../figures/`.
 
 - `sanity_check.py` — ring-geometry checks against the values quoted in the
   paper.
+- `test_yields.py` — unit test for the relative photon yields of screens at
+  different distances, in the simulator and the likelihood template.
 
 Figures that depend on Monte-Carlo data assume the relevant JSON already
 exists in `../results/`; run the corresponding data script first.

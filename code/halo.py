@@ -140,12 +140,16 @@ def simulate_halo(clouds, t_start_s, t_exp_s, E_keV=1.0,
     x0, y0 = source_xy
 
     # ---- cloud-choice probabilities -------------------------------------
-    # Candidates are drawn per cloud proportional to optical depth ONLY;
-    # the angular cross section enters once, through the acceptance step
-    # below, so that accepted photons per cloud scale as tau_i * w(theta_i).
+    # A screen at distance d delivers photons at a rate proportional to
+    # tau * w(theta) * c/d: since theta dtheta/dt = c/d, a nearer screen
+    # sweeps its ring through the cross section faster.  Candidates are
+    # therefore drawn per cloud proportional to tau_i / d_i, and the angular
+    # cross section enters once, through the acceptance step below, so that
+    # accepted photons per cloud scale as tau_i * w(theta_i) / d_i.
     # (Weighting the choice by the cross section as well would double-count
-    # it and suppress outer rings as w^2.)
-    yields = np.asarray([c.tau for c in clouds], float)
+    # it and suppress outer rings as w^2.)  Until 28 Sept 2026 the choice was
+    # proportional to tau alone, which under-weighted near screens by d_far/d.
+    yields = np.asarray([c.tau / c.d_pc for c in clouds], float)
     yields = yields / yields.sum()
 
     xs, ys = [], []
@@ -226,7 +230,8 @@ def _ring_radial_pdf(r, clouds, t_start_s, t_exp_s, E_keV, psf_sigma,
     """Un-normalized radial intensity (per unit area) at radius r produced by
     all clouds, given the exposure window.  Built by integrating the thin ring
     over the exposure time (top-hat in delay), weighting each cloud by its
-    scattering yield, and smearing radially by the PSF.
+    photon rate tau * w(theta) / d (the same yields as simulate_halo), and
+    smearing radially by the PSF.
     """
     r = np.asarray(r, float)
     ts = np.linspace(t_start_s, t_start_s + t_exp_s, n_r_samples)
@@ -237,7 +242,7 @@ def _ring_radial_pdf(r, clouds, t_start_s, t_exp_s, E_keV, psf_sigma,
     weights = []
     for c in clouds:
         th_mid = theta_ring_arcmin(t_mid, c.d_pc)
-        yield_w = c.tau * scattering_weight(th_mid, E_keV, c.a_um)
+        yield_w = c.tau * scattering_weight(th_mid, E_keV, c.a_um) / c.d_pc
         th_of_t = theta_ring_arcmin(ts, c.d_pc)          # ring radius vs time
         radii.append(th_of_t)
         weights.append(np.full(th_of_t.shape, yield_w))
