@@ -7,6 +7,19 @@ sources. Independent undergraduate research extending Nederlander & Paerels
 
 **Status: working draft, circulated for discussion. Not submitted.**
 
+**Known issue (September 2026).** In the simulations with several dust
+screens, each screen contributes photons in proportion to its optical depth
+alone. The physical rate at a given epoch carries an extra factor 1/d, because
+a screen at distance d spreads its photons over delays proportional to d. Near
+screens are therefore under-weighted: in the fiducial 60/150/400 pc sightline,
+the 60 pc screen by a factor 400/60 ≈ 6.7 relative to the 400 pc screen. Single-screen results are
+unaffected. Every result that uses more than one screen is being regenerated:
+the three-screen column of Table 1, Figures 2, 5–7 and 8 (right), and the
+multi-screen results of Sections 3.2 and 3.5–3.8, including the tomography
+and the 50-sightline ensemble. A preliminary re-run with corrected yields
+changes most localization errors by less than about 20%; the tomography has
+not yet been re-checked.
+
 ## Summary
 
 NP20 proposed that a prompt X-ray flash from a gravitational-wave source will
