@@ -1,5 +1,7 @@
 # Dust-Scattering Halos and Gravitational-Wave Counterpart Localization
 
+[![tests](https://github.com/vainegloire/dust-scattering-halos/actions/workflows/tests.yml/badge.svg)](https://github.com/vainegloire/dust-scattering-halos/actions/workflows/tests.yml)
+
 Monte-Carlo forward model and maximum-likelihood localization for Galactic
 dust-scattering halos produced by X-ray flashes from gravitational-wave
 sources. Independent undergraduate research extending Nederlander & Paerels

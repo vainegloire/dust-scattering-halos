@@ -1,0 +1,31 @@
+# On every push to main (and on pull requests): install the pinned
+# dependencies, run the photon-yield unit test and the geometry checks, and
+# regenerate every figure from the stored results, so a change that breaks
+# the simulator or a figure script is caught at once.
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
+      - name: Install the pinned dependencies
+        run: pip install -r requirements.txt
+      - name: Unit test and ring-geometry checks
+        run: make test
+      - name: Regenerate every figure from the stored results
+        run: make figures
+      - name: List figures that differ from the committed ones (informational)
+        run: git status --porcelain figures/
