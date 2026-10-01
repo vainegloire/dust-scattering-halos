@@ -1,0 +1,5 @@
+# Python 3.10.  These are the versions that produced the committed results and
+# figures; the figure scripts fix their random seeds, so with these versions
+# `make figures` reproduces the committed PNGs exactly.
+numpy==2.2.6
+matplotlib==3.10.9

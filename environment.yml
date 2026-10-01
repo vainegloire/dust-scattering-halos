@@ -1,0 +1,10 @@
+# conda env create -f environment.yml && conda activate dust-scattering-halos
+# (pip users: pip install -r requirements.txt)
+name: dust-scattering-halos
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - -r requirements.txt
